@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
+import './app.css';
+
 import Head from '../head';
 import SearchPanel from '../searchPanel';
 import TodoList from '../todoList';
 import ItemStatusFilter from '../itemStatusFilter';
-import './app.css';
+import ItemAddForm from '../itemAddForm';
 
 export default class App extends Component {
   state = {
@@ -25,16 +27,28 @@ export default class App extends Component {
     },
   ]};
 
+  // Счетчик id таска
+  idCount = this.state.todoData.length + 1;
+
   deleteItem = id => {
-
     this.setState(({ todoData }) => {
-     const newTodoData = todoData.filter(el => {
-       return el.id !== id;
-     });
-
+     const newTodoData = todoData.filter(el => el.id !== id);
      return { todoData: newTodoData }
     });
   };
+
+  addItem = () => {
+    const newItem = {
+      label: 'Какойто текст',
+      important: false,
+      id: this.idCount++
+    }
+
+    this.setState( ({todoData}) => {
+      const newTodoData = [ ...todoData, newItem];
+      return { todoData: newTodoData }
+    });
+  }
 
   render () {
     const { todoData } = this.state;
@@ -45,11 +59,12 @@ export default class App extends Component {
         <div className="top-panel d-flex">
           <SearchPanel />
           <ItemStatusFilter />
-        </div> 
-        
+        </div>         
         <TodoList 
           todos = { todoData }
-          onDeleted = { this.deleteItem } />   
+          onDeleted = { this.deleteItem }
+        />
+        <ItemAddForm onAddItem = { this.addItem }/>   
       </div>
     );
   }  
