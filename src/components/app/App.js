@@ -17,7 +17,9 @@ export default class App extends Component {
       this.createTodoItem('Выпить кофе.'),
       this.createTodoItem('Прочитать книгу по реакту.'),
       this.createTodoItem('Лечь спать.'),    
-  ]}; 
+    ],
+    term: ''
+  }; 
 
   //Логика
   createTodoItem(label) {
@@ -65,20 +67,32 @@ export default class App extends Component {
     });   
   };
 
+  onLiveSearch = (arrItems, term) => {    
+    if (term.length === 0) return arrItems;
+    return arrItems.filter(el => {
+      return el.label.toLowerCase().indexOf(term.toLowerCase()) > -1;
+    });    
+  }
+
+  onValueSerch = term => {
+    this.setState({ term });
+  };
+
   render () {
-    const { todoData } = this.state;
+    const { todoData, term } = this.state;
     const doneCount = todoData.filter(el => el.done).length;
     const todoItemCount = todoData.length - doneCount;
+    const renderItems = this.onLiveSearch(todoData, term);
 
     return (
       <div className='todo-app'>
         <Head toDo = { todoItemCount } done = { doneCount }/>
         <div className="top-panel d-flex">
-          <SearchPanel />
+          <SearchPanel onValueSerch = { this.onValueSerch }/>
           <ItemStatusFilter />
         </div>         
         <TodoList 
-          todos = { todoData }
+          todos = { renderItems }
           onDeleted = { this.deleteItem }
           onToggleImportant = { this.onToggleImportant }
           onToggleDone = { this.onToggleDone }
