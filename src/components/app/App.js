@@ -18,7 +18,8 @@ export default class App extends Component {
       this.createTodoItem('Прочитать книгу по реакту.'),
       this.createTodoItem('Лечь спать.'),    
     ],
-    term: ''
+    term: '',
+    filter: 'all'
   }; 
 
   //Логика
@@ -37,6 +38,19 @@ export default class App extends Component {
       return el;
     });
     return newTodoData;    
+  }
+
+  onFilter(arrItm, filter) {
+    switch(filter) {
+      case 'all':
+        return arrItm;
+       case 'active':
+        return arrItm.filter(el => !el.done);
+       case 'done':
+         return arrItm.filter(el => el.done);
+      default: 
+        return arrItm;
+    }
   }
 
   // Кастомные обработчики событий
@@ -72,24 +86,36 @@ export default class App extends Component {
     return arrItems.filter(el => {
       return el.label.toLowerCase().indexOf(term.toLowerCase()) > -1;
     });    
-  }
+  };
 
   onValueSerch = term => {
     this.setState({ term });
+  };  
+  
+  onFilterChange = name => {
+    this.setState(({ filter }) => {
+      return { filter: name }
+    });
   };
 
   render () {
-    const { todoData, term } = this.state;
+    const { todoData, term, filter } = this.state;
     const doneCount = todoData.filter(el => el.done).length;
     const todoItemCount = todoData.length - doneCount;
-    const renderItems = this.onLiveSearch(todoData, term);
+    const renderItems = this.onFilter(this.onLiveSearch(todoData, term), filter);
 
     return (
       <div className='todo-app'>
-        <Head toDo = { todoItemCount } done = { doneCount }/>
-        <div className="top-panel d-flex">
+        <Head 
+          toDo = { todoItemCount }
+          done = { doneCount }
+        />
+        <div className = "top-panel d-flex">
           <SearchPanel onValueSerch = { this.onValueSerch }/>
-          <ItemStatusFilter />
+          <ItemStatusFilter
+            filter = { filter }
+            onFilterChange = { this.onFilterChange }
+          />
         </div>         
         <TodoList 
           todos = { renderItems }
